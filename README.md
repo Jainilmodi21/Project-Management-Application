@@ -1,43 +1,179 @@
-# Project Management App
+# Project Management Application
 
-## Overview
+A full-stack project management web app built with React, Express, and MongoDB.
 
-The Project Management App is a web-based application designed to streamline project management and team collaboration. It offers features such as user authentication, a customizable dashboard, project and task management, team management, and security.
+## What Is Implemented
 
-## Features
+This section reflects the current codebase behavior.
 
-### 1. User Authentication
-- **Login/Logout**: Users can securely log in and log out of the system.
-- **Registration**: New users can create accounts with email verification.
+### Frontend (React)
+- Authentication pages: login and registration.
+- Dashboard with:
+	- total/active/completed project metrics
+	- recent projects list
+	- calendar view with highlighted active project due dates
+- Projects page listing projects assigned to the logged-in user.
+- Project details page with:
+	- edit/delete project (creator only)
+	- mark project as complete
+	- task list and task removal
+	- team member add/remove
+- Tasks page with:
+	- per-project task listing
+	- task creation and removal (creator only)
+	- completed-task approval action (creator only)
+- Task details page for viewing task info and marking task done.
+- User settings page for profile edit and logout.
 
-### 2. Dashboard
-- **Overview**: Displays key metrics, recent projects, and upcoming deadlines.
-- **Quick Actions**: Includes buttons for creating new projects, viewing the calendar, and accessing notifications.
-- **Project Managers**: Can create new projects and view the calendar.
-- **Team Members**: Can view the calendar and their pending tasks.
+### Backend (Node.js + Express + MongoDB)
+- User signup/login with bcrypt password hashing at signup and JWT token generation at login.
+- CRUD operations for users, projects, and tasks.
+- Team member management inside projects.
+- Task assignment to multiple users.
+- Cross-entity syncing:
+	- Project IDs are added/removed from users.
+	- Task IDs are added/removed from users and projects.
 
-### 3. Project Management
-- **Project Creation**: Project managers can create new projects with details like name, description, and deadlines.
-- **Project Details**: View and manage project information, tasks, and team members.
-- **Task Management**: Add, edit, delete, and update tasks within projects.
+## Tech Stack
 
-### 4. Task Details
-- **Task Information**: View and update task details, including priority, due date, and status.
-- **Project Managers**: View and update task details, including priority, due date, and status.
-- **Team Members**: View and update the status of tasks assigned to them.
+### Frontend
+- React 18
+- React Router
+- Axios + Fetch
+- Bootstrap + React Bootstrap
+- React Calendar
 
-### 5. Team Management
-- **Team Members**: Add, remove, and manage team members for projects.
-- **Role Assignment**: Assign and manage roles and permissions for team members.
+### Backend
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT (jsonwebtoken)
+- express-validator
+- bcrypt
 
-### 6. User Settings
-- **Profile Management**: Users can update personal information, change passwords, and configure notification settings.
+## Project Structure
 
-### 7. Security
-- **Data Protection**: Ensure secure data transmission and storage, including user authentication and authorization.
+```
+Backend/
+	controllers/
+	models/
+	Routes/
+	server.js
+frontend/
+	src/
+		components/
+		App.js
+		AuthContext.js
+README.md
+```
 
-## Installation
+## Prerequisites
 
-### Prerequisites
-- **Node.js**: v14.x or later
-- **MongoDB**: v4.x or later
+- Node.js 14+
+- npm
+- MongoDB running locally on `mongodb://127.0.0.1/project_management`
+
+## Setup and Run
+
+### 1. Clone
+
+```bash
+git clone https://github.com/Jainilmodi21/Project-Management-Application.git
+cd Project-Management-Application
+```
+
+### 2. Install dependencies
+
+Backend:
+
+```bash
+cd Backend
+npm install
+```
+
+Frontend:
+
+```bash
+cd ../frontend
+npm install
+```
+
+### 3. Start backend
+
+```bash
+cd ../Backend
+node server.js
+```
+
+Backend runs on `http://localhost:5000`.
+
+### 4. Start frontend
+
+```bash
+cd ../frontend
+npm start
+```
+
+Frontend runs on `http://localhost:3000`.
+
+## API Overview
+
+Base URL: `http://localhost:5000/api`
+
+### User routes
+- `GET /user`
+- `GET /user/:userId`
+- `GET /user/:userId/projects`
+- `GET /user/:userId/tasks`
+- `POST /user/signup`
+- `POST /user/login`
+- `PATCH /user/:userId`
+- `PATCH /user/change-password/:userId`
+- `DELETE /user/:userId`
+
+### Project routes
+- `GET /project`
+- `GET /project/:projectId`
+- `GET /project/:projectId/task/:user_id`
+- `GET /project/:projectId/team-members`
+- `POST /project`
+- `PATCH /project/:projectId`
+- `DELETE /project/:projectId`
+- `POST /project/:projectId/team-members`
+- `DELETE /project/:projectId/team-members/:member_id`
+- `DELETE /project/:projectId/:taskId`
+
+### Task routes
+- `GET /task`
+- `GET /task/:taskId`
+- `POST /task/:project_id`
+- `PATCH /task/:taskId`
+- `PATCH /task/:taskId/add-member`
+- `PATCH /task/:taskId/remove-member`
+- `DELETE /task/:projectId/:taskId`
+
+## Data Models
+
+### User
+- `name: String`
+- `email: String`
+- `password: String`
+- `projects: ObjectId[] -> Project`
+- `tasks: ObjectId[] -> Task`
+
+### Project
+- `name: String`
+- `description: String`
+- `startDate: Date`
+- `endDate: Date`
+- `status: String`
+- `created_by: ObjectId -> User`
+- `teamMembers: [{ user_id, role, name }]`
+- `tasks: ObjectId[] -> Task`
+
+### Task
+- `project_id: ObjectId -> Project`
+- `name: String`
+- `description: String`
+- `due_date: Date`
+- `status: String`
+- `assignedTo: ObjectId[] -> User`
